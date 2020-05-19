@@ -19,7 +19,8 @@ libcamera_deps = [
       dependency('camera', required : true),
 ]
 
-cpp_arguments = '-Wno-unused-parameter'
+cpp_arguments = [ '-Wno-unused-parameter', ]
+
 add_project_arguments(cpp_arguments, language : 'cpp')
 
 # elce-cam executable
