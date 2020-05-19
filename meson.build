@@ -6,9 +6,6 @@ project('elce-cam', 'c', 'cpp',
 		'cpp_std=c++11',
 	])
 
-cc = meson.get_compiler('c')
-config_h = configuration_data()
-
 # elce-cam source files
 # elce-cam.cpp is the fully commented application
 # mini=elce.cpp is for live coding during ELC-E 2019
