@@ -1,3 +1,11 @@
+/* SPDX-License-Identifier: GPL-2.0-or-later */
+/*
+ * Copyright (C) 2020, Ideas on Board Oy.
+ *
+ * A simple libcamera capture example
+ */
+
+#include <iomanip>
 #include <iostream>
 #include <memory>
 
@@ -13,39 +21,59 @@ std::shared_ptr<Camera> camera;
  * For each Camera::requestCompleted Signal emitted from the Camera the
  * connected Slot is invoked.
  *
- * The Slot receives as parameters the Request it refers to and a map of
- * Stream to Buffer containing image data.
+ * The Slot receives the Request as a parameter.
  */
-static void requestComplete(Request *request,
-			    const std::map<Stream *, Buffer *> &buffers)
+static void requestComplete(Request *request)
 {
 	if (request->status() == Request::RequestCancelled)
 		return;
 
-	for (auto const &it : buffers) {
-		Buffer *buffer = it.second;
+	const std::map<Stream *, FrameBuffer *> &buffers = request->buffers();
 
-		std::cout << " (" << buffer->index() << ")"
-			  << " seq: " << buffer->sequence() << " bytesused: "
-			  << buffer->bytesused() << std::endl;
+	for (auto bufferPair : buffers) {
+		// (Unused) Stream *stream = bufferPair.first;
+		FrameBuffer *buffer = bufferPair.second;
+		const FrameMetadata &metadata = buffer->metadata();
 
-		/* Here you can access image data! */
+		/* Print some information about the buffer which has completed. */
+		std::cout << " seq: " << std::setw(6) << std::setfill('0') << metadata.sequence
+			  << " bytesused: ";
+
+		unsigned int nplane = 0;
+		for (const FrameMetadata::Plane &plane : metadata.planes)
+		{
+			std::cout << plane.bytesused;
+			if (++nplane < metadata.planes.size())
+				std::cout << "/";
+		}
+
+		std::cout << std::endl;
+
+		/*
+		 * Image data can be accessed here, but the FrameBuffer
+		 * must be mapped by the application
+		 */
 	}
 
 	/*
 	 * Re-queue a Request to the camera.
 	 *
-	 * Request and Buffer are transient objects, they are re-created on
-	 * the fly and re-queued.
+	 * Create a new request and populate it with one buffer for each
+	 * stream.
 	 */
 	request = camera->createRequest();
-	for (auto const &it : buffers) {
-		Stream *stream = it.first;
-		Buffer *buffer = it.second;
-		unsigned int index = buffer->index();
+	if (!request)
+	{
+		std::cerr << "Can't create request" << std::endl;
+		return;
+	}
 
-		std::unique_ptr<Buffer> newBuffer = stream->createBuffer(index);
-		request->addBuffer(std::move(newBuffer));
+	for (auto it = buffers.begin(); it != buffers.end(); ++it)
+	{
+		Stream *stream = it->first;
+		FrameBuffer *buffer = it->second;
+
+		request->addBuffer(stream, buffer);
 	}
 
 	camera->queueRequest(request);
@@ -196,7 +224,19 @@ int main()
 	 * Streams sizes and formats, so we now have to ask it to reserve
 	 * memory for all of them.
 	 */
-	camera->allocateBuffers();
+	/* TODO: Update the comment here too */
+	FrameBufferAllocator *allocator = new FrameBufferAllocator(camera);
+
+	for (StreamConfiguration &cfg : *config) {
+		int ret = allocator->allocate(cfg.stream());
+		if (ret < 0) {
+			std::cerr << "Can't allocate buffers" << std::endl;
+			return -ENOMEM;
+		}
+
+		unsigned int allocated = allocator->buffers(cfg.stream()).size();
+		std::cout << "Allocated " << allocated << " buffers for stream" << std::endl;
+	}
 
 	/*
 	 * --------------------------------------------------------------------
@@ -217,11 +257,24 @@ int main()
 	 * properties that reports the capture parameters applied to the image.
 	 */
 	Stream *stream = streamConfig.stream();
+	const std::vector<std::unique_ptr<FrameBuffer>> &buffers = allocator->buffers(stream);
 	std::vector<Request *> requests;
-	for (unsigned int i = 0; i < streamConfig.bufferCount; ++i) {
+	for (unsigned int i = 0; i < buffers.size(); ++i) {
 		Request *request = camera->createRequest();
-		std::unique_ptr<Buffer> buffer = stream->createBuffer(i);
-		request->addBuffer(std::move(buffer));
+		if (!request)
+		{
+			std::cerr << "Can't create request" << std::endl;
+			return -ENOMEM;
+		}
+
+		const std::unique_ptr<FrameBuffer> &buffer = buffers[i];
+		int ret = request->addBuffer(stream, buffer.get());
+		if (ret < 0)
+		{
+			std::cerr << "Can't set buffer for request"
+				  << std::endl;
+			return ret;
+		}
 
 		requests.push_back(request);
 
@@ -297,7 +350,7 @@ int main()
 	 * Libcamera has now released all resources it owned.
 	 */
 	camera->stop();
-	camera->freeBuffers();
+	allocator->free(stream);
 	camera->release();
 	camera.reset();
 	cm->stop();
