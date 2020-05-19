@@ -1,4 +1,4 @@
-project('elce-cam', 'c', 'cpp',
+project('simple-cam', 'c', 'cpp',
 	default_options : [
 		'werror=true',
 		'-Wno-unused-parameter=true',
@@ -6,11 +6,9 @@ project('elce-cam', 'c', 'cpp',
 		'cpp_std=c++14',
 	])
 
-# elce-cam source files
-# elce-cam.cpp is the fully commented application
-# mini=elce.cpp is for live coding during ELC-E 2019
+# simple-cam.cpp is the fully commented application
 src_files = files([
-	'elce-cam.cpp',
+	'simple-cam.cpp',
 ])
 
 # Point your PKG_CONFIG_PATH environment variable to the
@@ -23,7 +21,6 @@ cpp_arguments = [ '-Wno-unused-parameter', ]
 
 add_project_arguments(cpp_arguments, language : 'cpp')
 
-# elce-cam executable
-elce_cam = executable('elce-cam', src_files,
-		      dependencies : libcamera_deps,
-		      install : false)
+# simple-cam executable
+simple_cam = executable('simple-cam', src_files,
+                        dependencies : libcamera_deps)
