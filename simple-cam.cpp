@@ -351,6 +351,7 @@ int main()
 	 */
 	camera->stop();
 	allocator->free(stream);
+	delete allocator;
 	camera->release();
 	camera.reset();
 	cm->stop();
