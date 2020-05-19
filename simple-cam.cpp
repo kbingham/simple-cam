@@ -61,7 +61,7 @@ int main()
 	 * in the system, by associating Pipeline Handlers with media entities
 	 * registered in the system.
 	 *
-	 * The CameraManager provides a list of available Camera that
+	 * The CameraManager provides a list of available Cameras that
 	 * applications can operate on.
 	 */
 	CameraManager *cm = new CameraManager();
