@@ -279,11 +279,10 @@ int main()
 		requests.push_back(request);
 
 		/*
-		 * todo: Set controls
-		 *
-		 * ControlList &Request::controls();
-		 * controls.set(controls::Brightness, 255);
+		 * Controls can be added to a request on a per frame basis.
 		 */
+		ControlList &controls = request->controls();
+		controls.set(controls::Brightness, 0.5);
 	}
 
 	/*
