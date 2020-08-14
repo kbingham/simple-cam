@@ -96,11 +96,11 @@ int main()
 	cm->start();
 
 	/*
-	 * Just as a test, list all names of the Camera registered in the
+	 * Just as a test, list all id's of the Camera registered in the
 	 * system. They are indexed by name by the CameraManager.
 	 */
 	for (auto const &camera : cm->cameras())
-		std::cout << camera->name() << std::endl;
+		std::cout << camera->id() << std::endl;
 
 	/*
 	 * --------------------------------------------------------------------
@@ -117,9 +117,14 @@ int main()
 	 * Once done with it, application shall similarly 'release' the Camera.
 	 *
 	 * As an example, use the first available camera in the system.
+	 *
+	 * Cameras can be obtained by their ID or their index, to demonstrate
+	 * this, the following code gets the ID of the first camera; then gets
+	 * the camera associated with that ID (which is of course the same as
+	 * cm->cameras()[0]).
 	 */
-	std::string cameraName = cm->cameras()[0]->name();
-	camera = cm->get(cameraName);
+	std::string cameraId = cm->cameras()[0]->id();
+	camera = cm->get(cameraId);
 	camera->acquire();
 
 	/*
