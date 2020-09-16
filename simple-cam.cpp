@@ -28,7 +28,7 @@ static void requestComplete(Request *request)
 	if (request->status() == Request::RequestCancelled)
 		return;
 
-	const std::map<Stream *, FrameBuffer *> &buffers = request->buffers();
+	const Request::BufferMap &buffers = request->buffers();
 
 	for (auto bufferPair : buffers) {
 		// (Unused) Stream *stream = bufferPair.first;
@@ -70,7 +70,7 @@ static void requestComplete(Request *request)
 
 	for (auto it = buffers.begin(); it != buffers.end(); ++it)
 	{
-		Stream *stream = it->first;
+		const Stream *stream = it->first;
 		FrameBuffer *buffer = it->second;
 
 		request->addBuffer(stream, buffer);
