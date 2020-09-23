@@ -70,7 +70,7 @@ static void requestComplete(Request *request)
 
 	for (auto it = buffers.begin(); it != buffers.end(); ++it)
 	{
-		Stream *stream = it->first;
+		const Stream *stream = it->first;
 		FrameBuffer *buffer = it->second;
 
 		request->addBuffer(stream, buffer);
