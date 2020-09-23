@@ -1,7 +1,6 @@
 project('simple-cam', 'c', 'cpp',
 	default_options : [
 		'werror=true',
-		'-Wno-unused-parameter=true',
 		'warning_level=2',
 		'cpp_std=c++14',
 	])
