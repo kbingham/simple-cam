@@ -2,7 +2,7 @@ project('simple-cam', 'c', 'cpp',
 	default_options : [
 		'werror=true',
 		'warning_level=2',
-		'cpp_std=c++14',
+		'cpp_std=c++17',
 	])
 
 # simple-cam.cpp is the fully commented application
