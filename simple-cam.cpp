@@ -55,27 +55,8 @@ static void requestComplete(Request *request)
 		 */
 	}
 
-	/*
-	 * Re-queue a Request to the camera.
-	 *
-	 * Create a new request and populate it with one buffer for each
-	 * stream.
-	 */
-	request = camera->createRequest();
-	if (!request)
-	{
-		std::cerr << "Can't create request" << std::endl;
-		return;
-	}
-
-	for (auto it = buffers.begin(); it != buffers.end(); ++it)
-	{
-		const Stream *stream = it->first;
-		FrameBuffer *buffer = it->second;
-
-		request->addBuffer(stream, buffer);
-	}
-
+	/* Re-queue the Request to the camera. */
+	request->reuse(Request::ReuseBuffers);
 	camera->queueRequest(request);
 }
 
@@ -263,9 +244,9 @@ int main()
 	 */
 	Stream *stream = streamConfig.stream();
 	const std::vector<std::unique_ptr<FrameBuffer>> &buffers = allocator->buffers(stream);
-	std::vector<Request *> requests;
+	std::vector<std::unique_ptr<Request>> requests;
 	for (unsigned int i = 0; i < buffers.size(); ++i) {
-		Request *request = camera->createRequest();
+		std::unique_ptr<Request> request = camera->createRequest();
 		if (!request)
 		{
 			std::cerr << "Can't create request" << std::endl;
@@ -281,13 +262,13 @@ int main()
 			return ret;
 		}
 
-		requests.push_back(request);
-
 		/*
 		 * Controls can be added to a request on a per frame basis.
 		 */
 		ControlList &controls = request->controls();
 		controls.set(controls::Brightness, 0.5);
+
+		requests.push_back(std::move(request));
 	}
 
 	/*
@@ -323,8 +304,8 @@ int main()
 	 * Camera::requestCompleted Signal is called.
 	 */
 	camera->start();
-	for (Request *request : requests)
-		camera->queueRequest(request);
+	for (std::unique_ptr<Request> &request : requests)
+		camera->queueRequest(request.get());
 
 	/*
 	 * --------------------------------------------------------------------
