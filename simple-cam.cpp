@@ -78,6 +78,47 @@ static void processRequest(Request *request)
 	camera->queueRequest(request);
 }
 
+/*
+ * ----------------------------------------------------------------------------
+ * Camera Naming.
+ *
+ * Applications are responsible for deciding how to name cameras, and present
+ * that information to the users. Every camera has a unique identifier, though
+ * this string is not designed to be friendly for a human reader.
+ *
+ * To support human consumable names, libcamera provides camera properties
+ * that allow an application to determine a naming scheme based on its needs.
+ *
+ * In this example, we focus on the location property, but also detail the
+ * model string for external cameras, as this is more likely to be visible
+ * information to the user of an externally connected device.
+ *
+ * The unique camera ID is appended for informative purposes.
+ */
+std::string cameraName(Camera *camera)
+{
+	const ControlList &props = camera->properties();
+	std::string name;
+
+	switch (props.get(properties::Location)) {
+	case properties::CameraLocationFront:
+		name = "Internal front camera";
+		break;
+	case properties::CameraLocationBack:
+		name = "Internal back camera";
+		break;
+	case properties::CameraLocationExternal:
+		name = "External camera";
+		if (props.contains(properties::Model))
+			name += " '" + props.get(properties::Model) + "'";
+		break;
+	}
+
+	name += " (" + camera->id() + ")";
+
+	return name;
+}
+
 int main()
 {
 	/*
@@ -95,11 +136,11 @@ int main()
 	cm->start();
 
 	/*
-	 * Just as a test, list all id's of the Camera registered in the
-	 * system. They are indexed by name by the CameraManager.
+	 * Just as a test, generate names of the Cameras registered in the
+	 * system, and list them.
 	 */
 	for (auto const &camera : cm->cameras())
-		std::cout << camera->id() << std::endl;
+		std::cout << " - " << cameraName(camera.get()) << std::endl;
 
 	/*
 	 * --------------------------------------------------------------------
