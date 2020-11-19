@@ -312,7 +312,7 @@ int main()
 	 * Run an EventLoop
 	 *
 	 * In order to dispatch events received from the video devices, such
-	 * as buffer completions, an even loop as to be run.
+	 * as buffer completions, an event loop has to be run.
 	 *
 	 * Libcamera provides its own default event dispatcher realized by
 	 * polling a set of file descriptors, but applications can integrate
