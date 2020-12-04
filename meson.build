@@ -13,7 +13,7 @@ src_files = files([
 
 # Point your PKG_CONFIG_PATH environment variable to the
 # libcamera install path camera.pc file ($prefix/lib/pkgconfig/camera.pc)
-libcamera_deps = [
+deps = [
       dependency('camera', required : true),
       dependency('libevent_pthreads'),
 ]
@@ -24,4 +24,4 @@ add_project_arguments(cpp_arguments, language : 'cpp')
 
 # simple-cam executable
 simple_cam = executable('simple-cam', src_files,
-                        dependencies : libcamera_deps)
+                        dependencies : deps)
