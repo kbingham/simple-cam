@@ -184,7 +184,7 @@ int main()
 	int ret = camera->configure(config.get());
 	if (ret) {
 		std::cout << "CONFIGURATION FAILED!" << std::endl;
-		return -1;
+		return EXIT_FAILURE;
 	}
 #endif
 
@@ -217,7 +217,7 @@ int main()
 		int ret = allocator->allocate(cfg.stream());
 		if (ret < 0) {
 			std::cerr << "Can't allocate buffers" << std::endl;
-			return -ENOMEM;
+			return EXIT_FAILURE;
 		}
 
 		unsigned int allocated = allocator->buffers(cfg.stream()).size();
@@ -250,7 +250,7 @@ int main()
 		if (!request)
 		{
 			std::cerr << "Can't create request" << std::endl;
-			return -ENOMEM;
+			return EXIT_FAILURE;
 		}
 
 		const std::unique_ptr<FrameBuffer> &buffer = buffers[i];
@@ -259,7 +259,7 @@ int main()
 		{
 			std::cerr << "Can't set buffer for request"
 				  << std::endl;
-			return ret;
+			return EXIT_FAILURE;
 		}
 
 		/*
@@ -341,5 +341,5 @@ int main()
 	camera.reset();
 	cm->stop();
 
-	return 0;
+	return EXIT_SUCCESS;
 }
