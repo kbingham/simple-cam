@@ -307,6 +307,13 @@ int main()
 	for (std::unique_ptr<Request> &request : requests)
 		camera->queueRequest(request.get());
 
+	if (!cm->cameras().size()) {
+		std::cout << "No cameras were identified on the system."
+			  << std::endl;
+		cm->stop();
+		return EXIT_FAILURE;
+	}
+
 	/*
 	 * --------------------------------------------------------------------
 	 * Run an EventLoop
