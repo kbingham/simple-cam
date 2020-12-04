@@ -11,8 +11,13 @@
 
 #include <libcamera/libcamera.h>
 
+#include "event_loop.h"
+
+#define TIMEOUT_SEC 3
+
 using namespace libcamera;
 std::shared_ptr<Camera> camera;
+EventLoop loop;
 
 /*
  * --------------------------------------------------------------------
@@ -21,13 +26,26 @@ std::shared_ptr<Camera> camera;
  * For each Camera::requestCompleted Signal emitted from the Camera the
  * connected Slot is invoked.
  *
+ * The Slot is invoked in the CameraManager's thread, hence one should avoid
+ * any heavy processing here. The processing of the request shall be re-directed
+ * to the application's thread instead, so as not to block the CameraManager's
+ * thread for large amount of time.
+ *
  * The Slot receives the Request as a parameter.
  */
+
+static void processRequest(Request *request);
+
 static void requestComplete(Request *request)
 {
 	if (request->status() == Request::RequestCancelled)
 		return;
 
+	loop.callLater(std::bind(&processRequest, request));
+}
+
+static void processRequest(Request *request)
+{
 	const Request::BufferMap &buffers = request->buffers();
 
 	for (auto bufferPair : buffers) {
@@ -320,20 +338,11 @@ int main()
 	 *
 	 * In order to dispatch events received from the video devices, such
 	 * as buffer completions, an event loop has to be run.
-	 *
-	 * Libcamera provides its own default event dispatcher realized by
-	 * polling a set of file descriptors, but applications can integrate
-	 * their own even loop with the Libcamera EventDispatcher.
-	 *
-	 * Here, as an example, run the poll-based EventDispatcher for 3
-	 * seconds.
 	 */
-	EventDispatcher *dispatcher = cm->eventDispatcher();
-	Timer timer;
-	timer.start(3000);
-	while (timer.isRunning())
-		dispatcher->processEvents();
-
+	loop.timeout(TIMEOUT_SEC);
+	int ret = loop.exec();
+	std::cout << "Capture ran for " << TIMEOUT_SEC << " seconds and "
+		  << "stopped with exit status: " << ret << std::endl;
 	/*
 	 * --------------------------------------------------------------------
 	 * Clean Up
