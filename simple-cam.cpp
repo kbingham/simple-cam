@@ -307,7 +307,7 @@ int main()
 	 * --------------------------------------------------------------------
 	 * Frame Capture
 	 *
-	 * Libcamera frames capture model is based on the 'Request' concept.
+	 * libcamera frames capture model is based on the 'Request' concept.
 	 * For each frame a Request has to be queued to the Camera.
 	 *
 	 * A Request refers to (at least one) Stream for which a Buffer that
@@ -354,7 +354,7 @@ int main()
 	 * --------------------------------------------------------------------
 	 * Signal&Slots
 	 *
-	 * Libcamera uses a Signal&Slot based system to connect events to
+	 * libcamera uses a Signal&Slot based system to connect events to
 	 * callback operations meant to handle them, inspired by the QT graphic
 	 * toolkit.
 	 *
@@ -404,12 +404,13 @@ int main()
 	int ret = loop.exec();
 	std::cout << "Capture ran for " << TIMEOUT_SEC << " seconds and "
 		  << "stopped with exit status: " << ret << std::endl;
+
 	/*
 	 * --------------------------------------------------------------------
 	 * Clean Up
 	 *
 	 * Stop the Camera, release resources and stop the CameraManager.
-	 * Libcamera has now released all resources it owned.
+	 * libcamera has now released all resources it owned.
 	 */
 	camera->stop();
 	allocator->free(stream);
