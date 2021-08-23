@@ -255,16 +255,17 @@ int main()
 #endif
 
 	/*
-	 * Validating a CameraConfiguration -before- applying it adjust it
-	 * to a valid configuration as closest as possible to the requested one.
+	 * Validating a CameraConfiguration -before- applying it will adjust it
+	 * to a valid configuration which is as close as possible to the one
+	 * requested.
 	 */
 	config->validate();
 	std::cout << "Validated viewfinder configuration is: "
 		  << streamConfig.toString() << std::endl;
 
 	/*
-	 * Once we have a validate configuration, we can apply it
-	 * to the Camera.
+	 * Once we have a validated configuration, we can apply it to the
+	 * Camera.
 	 */
 	camera->configure(config.get());
 
