@@ -274,10 +274,22 @@ int main()
 	 * Buffer Allocation
 	 *
 	 * Now that a camera has been configured, it knows all about its
-	 * Streams sizes and formats, so we now have to ask it to reserve
-	 * memory for all of them.
+	 * Streams sizes and formats. The captured images need to be stored in
+	 * framebuffers which can either be provided by the application to the
+	 * library, or allocated in the Camera and exposed to the application
+	 * by libcamera.
+	 *
+	 * An application may decide to allocate framebuffers from elsewhere,
+	 * for example in memory allocated by the display driver that will
+	 * render the captured frames. The application will provide them to
+	 * libcamera by constructing FrameBuffer instances to capture images
+	 * directly into.
+	 *
+	 * Alternatively libcamera can help the application by exporting
+	 * buffers allocated in the Camera using a FrameBufferAllocator
+	 * instance and referencing a configured Camera to determine the
+	 * appropriate buffer size and types to create.
 	 */
-	/* TODO: Update the comment here too */
 	FrameBufferAllocator *allocator = new FrameBufferAllocator(camera);
 
 	for (StreamConfiguration &cfg : *config) {
