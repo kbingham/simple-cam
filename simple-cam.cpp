@@ -131,8 +131,15 @@ int main()
 	 *
 	 * The CameraManager provides a list of available Cameras that
 	 * applications can operate on.
+	 *
+	 * When the CameraManager is no longer to be used, it should be deleted.
+	 * We use a unique_ptr here to manage the lifetime automatically during
+	 * the scope of this function.
+	 *
+	 * There can only be a single CameraManager constructed within any
+	 * process space.
 	 */
-	CameraManager *cm = new CameraManager();
+	std::unique_ptr<CameraManager> cm = std::make_unique<CameraManager>();
 	cm->start();
 
 	/*
