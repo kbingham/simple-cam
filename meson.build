@@ -12,7 +12,7 @@ src_files = files([
 ])
 
 # Point your PKG_CONFIG_PATH environment variable to the
-# libcamera install path camera.pc file ($prefix/lib/pkgconfig/camera.pc)
+# libcamera install path libcamera.pc file ($prefix/lib/pkgconfig/libcamera.pc)
 deps = [
       dependency('libcamera', required : true),
       dependency('libevent_pthreads'),
