@@ -58,10 +58,10 @@ static void processRequest(Request *request)
 			  << " bytesused: ";
 
 		unsigned int nplane = 0;
-		for (const FrameMetadata::Plane &plane : metadata.planes)
+		for (const FrameMetadata::Plane &plane : metadata.planes())
 		{
 			std::cout << plane.bytesused;
-			if (++nplane < metadata.planes.size())
+			if (++nplane < metadata.planes().size())
 				std::cout << "/";
 		}
 
