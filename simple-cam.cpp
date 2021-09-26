@@ -163,13 +163,21 @@ int main()
 	 * Application lock usage of Camera by 'acquiring' them.
 	 * Once done with it, application shall similarly 'release' the Camera.
 	 *
-	 * As an example, use the first available camera in the system.
+	 * As an example, use the first available camera in the system after
+	 * making sure that at least one camera is available.
 	 *
 	 * Cameras can be obtained by their ID or their index, to demonstrate
 	 * this, the following code gets the ID of the first camera; then gets
 	 * the camera associated with that ID (which is of course the same as
 	 * cm->cameras()[0]).
 	 */
+	if (cm->cameras().empty()) {
+		std::cout << "No cameras were identified on the system."
+			  << std::endl;
+		cm->stop();
+		return EXIT_FAILURE;
+	}
+
 	std::string cameraId = cm->cameras()[0]->id();
 	camera = cm->get(cameraId);
 	camera->acquire();
@@ -385,13 +393,6 @@ int main()
 	camera->start();
 	for (std::unique_ptr<Request> &request : requests)
 		camera->queueRequest(request.get());
-
-	if (!cm->cameras().size()) {
-		std::cout << "No cameras were identified on the system."
-			  << std::endl;
-		cm->stop();
-		return EXIT_FAILURE;
-	}
 
 	/*
 	 * --------------------------------------------------------------------
