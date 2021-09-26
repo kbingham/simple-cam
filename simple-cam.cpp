@@ -16,8 +16,8 @@
 #define TIMEOUT_SEC 3
 
 using namespace libcamera;
-std::shared_ptr<Camera> camera;
-EventLoop loop;
+static std::shared_ptr<Camera> camera;
+static EventLoop loop;
 
 /*
  * --------------------------------------------------------------------
