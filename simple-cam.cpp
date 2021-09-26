@@ -307,7 +307,7 @@ int main()
 			return EXIT_FAILURE;
 		}
 
-		unsigned int allocated = allocator->buffers(cfg.stream()).size();
+		size_t allocated = allocator->buffers(cfg.stream()).size();
 		std::cout << "Allocated " << allocated << " buffers for stream" << std::endl;
 	}
 
