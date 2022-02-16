@@ -46,8 +46,17 @@ static void requestComplete(Request *request)
 
 static void processRequest(Request *request)
 {
+	/*
+	 * Each buffer has its own FrameMetadata to describe its state, or the
+	 * usage of each buffer. While in our simple capture we only provide one
+	 * buffer per request, a request can have a buffer for each stream that
+	 * is established when configuring the camera.
+	 *
+	 * This allows a viewfinder and a still image to be processed at the
+	 * same time, or to allow obtaining the RAW capture buffer from the
+	 * sensor along with the image as processed by the ISP.
+	 */
 	const Request::BufferMap &buffers = request->buffers();
-
 	for (auto bufferPair : buffers) {
 		// (Unused) Stream *stream = bufferPair.first;
 		FrameBuffer *buffer = bufferPair.second;
@@ -55,6 +64,7 @@ static void processRequest(Request *request)
 
 		/* Print some information about the buffer which has completed. */
 		std::cout << " seq: " << std::setw(6) << std::setfill('0') << metadata.sequence
+			  << " timestamp: " << metadata.timestamp
 			  << " bytesused: ";
 
 		unsigned int nplane = 0;
