@@ -46,6 +46,29 @@ static void requestComplete(Request *request)
 
 static void processRequest(Request *request)
 {
+	std::cout << std::endl
+		  << "Request completed: " << request->toString() << std::endl;
+
+	/*
+	 * When a request has completed, it is populated with a metadata control
+	 * list that allows an application to determine various properties of
+	 * the completed request. This can include the timestamp of the Sensor
+	 * capture, or its gain and exposure values, or properties from the IPA
+	 * such as the state of the 3A algorithms.
+	 *
+	 * ControlValue types have a toString, so to examine each request, print
+	 * all the metadata for inspection. A custom application can parse each
+	 * of these items and process them according to its needs.
+	 */
+	const ControlList &requestMetadata = request->metadata();
+	for (const auto &ctrl : requestMetadata) {
+		const ControlId *id = controls::controls.at(ctrl.first);
+		const ControlValue &value = ctrl.second;
+
+		std::cout << "\t" << id->name() << " = " << value.toString()
+			  << std::endl;
+	}
+
 	/*
 	 * Each buffer has its own FrameMetadata to describe its state, or the
 	 * usage of each buffer. While in our simple capture we only provide one
