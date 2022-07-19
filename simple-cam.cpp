@@ -133,18 +133,22 @@ std::string cameraName(Camera *camera)
 	const ControlList &props = camera->properties();
 	std::string name;
 
-	switch (props.get(properties::Location)) {
-	case properties::CameraLocationFront:
-		name = "Internal front camera";
-		break;
-	case properties::CameraLocationBack:
-		name = "Internal back camera";
-		break;
-	case properties::CameraLocationExternal:
-		name = "External camera";
-		if (props.contains(properties::Model))
-			name += " '" + props.get(properties::Model) + "'";
-		break;
+	const auto &location = props.get(properties::Location);
+	if (location) {
+		switch (*location) {
+		case properties::CameraLocationFront:
+			name = "Internal front camera";
+			break;
+		case properties::CameraLocationBack:
+			name = "Internal back camera";
+			break;
+		case properties::CameraLocationExternal:
+			name = "External camera";
+			const auto &model = props.get(properties::Model);
+			if (model)
+				name = " '" + *model + "'";
+			break;
+		}
 	}
 
 	name += " (" + camera->id() + ")";
