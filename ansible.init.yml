@@ -1,0 +1,75 @@
+---
+- name: Init Raspberry Pi
+  hosts: raspberry_pi
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+      become: yes # use sudo
+
+    - name: Install necessary packages
+      apt:
+        pkg: 
+          - mc
+          - git
+          - cmake
+          - tmux
+          - libcamera-dev
+          - libopencv-dev
+          - python3-pip
+          - python3-venv
+          - libopenblas-dev
+          - libevent-dev
+          - libevent-pthreads-2.1-7
+        state: present
+      become: yes # use sudo
+
+    - name: Update CONF_SWAPSIZE in /etc/dphys-swapfile
+      ansible.builtin.lineinfile:
+        path: /etc/dphys-swapfile
+        regexp: '^CONF_SWAPSIZE='
+        line: 'CONF_SWAPSIZE=2048'
+      become: yes # use sudo
+
+    - name: Update CONF_MAXSWAP in /etc/dphys-swapfile
+      ansible.builtin.lineinfile:
+        path: /etc/dphys-swapfile
+        regexp: '^#CONF_MAXSWAP=.+'
+        line: 'CONF_MAXSWAP=2048'
+      become: yes # use sudo
+
+    - name: Clone tmux repository
+      git:
+        repo: "https://github.com/gpakosz/.tmux.git"
+        dest: "~/.tmux"
+
+    - name: Create symbolic link for .tmux.conf
+      command:
+        cmd: ln -s -f ~/.tmux/.tmux.conf ~/.tmux.conf
+        creates: "~/.tmux.conf"
+
+    - name: Copy .tmux.conf.local file
+      command:
+        cmd: cp ~/.tmux/.tmux.conf.local ~/
+        creates: "~/.tmux.conf.local"
+
+    - name: Create Projects folder
+      file:
+        path: "~/Projects"
+        state: directory
+
+    - name: Clone tmux repository
+      git:
+        repo: 'https://github.com/kbingham/simple-cam.git'
+        dest: "~/Projects/simple-cam"
+        update: no
+
+    - name: Create build folder
+      file:
+        path: "~/Projects/simple-cam/build"
+        state: directory
+
+    - name: Create a virtual environment
+      shell: python3 -m venv ~/Projects/.venv
+      args:
+        creates: ~/Projects/.venv

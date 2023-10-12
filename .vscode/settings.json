@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "*.pixi": "c",
+        "ostream": "cpp"
+    }
+}
