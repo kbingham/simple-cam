@@ -1,0 +1,14 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build",
+            "type": "shell",
+            "command": "cmake --build ${workspaceFolder}/build", // Assumes build directory is in the workspace folder
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+    ]
+}

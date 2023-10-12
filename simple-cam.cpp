@@ -258,7 +258,7 @@ int main()
 	 * roles for each Stream the application requires.
 	 */
 	std::unique_ptr<CameraConfiguration> config =
-		camera->generateConfiguration( { StreamRole::Viewfinder } );
+		camera->generateConfiguration( { StreamRole::StillCapture } );
 
 	/*
 	 * The CameraConfiguration contains a StreamConfiguration instance
@@ -352,7 +352,7 @@ int main()
 	 * --------------------------------------------------------------------
 	 * Frame Capture
 	 *
-	 * libcamera frames capture model is based on the 'Request' concept.
+	 * libcamera frames capture model is based on the 'Reqeuest' concept.
 	 * For each frame a Request has to be queued to the Camera.
 	 *
 	 * A Request refers to (at least one) Stream for which a Buffer that
@@ -389,8 +389,8 @@ int main()
 		/*
 		 * Controls can be added to a request on a per frame basis.
 		 */
-		ControlList &controls = request->controls();
-		controls.set(controls::Brightness, 0.5);
+		// ControlList &controls = request->controls();
+		// controls.set(controls::Brightness, 0.5);
 
 		requests.push_back(std::move(request));
 	}
